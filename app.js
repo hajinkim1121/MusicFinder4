@@ -178,11 +178,9 @@ if (typeof window.api !== 'undefined' && typeof window.api.dbCall === 'function'
       
       // 1. Try Naver
       try {
-        const response = await fetch(
-          `https://네가배포한주소.vercel.app/api/search?q=${encodeURIComponent(query)}`
-        );
-
-const result = await response.json();
+       const naverUrl = proxyUrl(...)
+      const response = await fetch(naverUrl);
+      const naverHtml = await response.text();
         
         const titleMatch = naverHtml.match(/class="area_text_title"[\s\S]*?<strong class="_text">([\s\S]*?)<\/strong>/i);
         const lyricsMatch = naverHtml.match(/class="[^"]*?_content_text[^"]*?"[\s\S]*?>([\s\S]*?)<\/p>/i);
