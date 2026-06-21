@@ -747,6 +747,12 @@ function setupHummingSearch() {
   const statusText = document.getElementById('recording-status');
   const recordTime = document.getElementById('record-time');
   const canvas = document.getElementById('waveform-canvas');
+
+  if (!canvas) {
+    console.warn('humming canvas not found');
+    return;
+  }
+  
   const ctx = canvas.getContext('2d');
   
   canvas.width = canvas.parentElement.clientWidth;
