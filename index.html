@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Music Finder & Community</title>
+  <!-- Google Fonts: Inter & Outfit & Noto Sans KR -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Noto+Sans+KR:wght@300;400;500;700&family=Outfit:wght@400;600;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="index.css">
+</head>
+<body>
+  <div class="app-container">
+    <!-- 왼쪽 사이드바 네비게이션 -->
+    <aside class="sidebar">
+      <div class="sidebar-logo">
+        <span class="logo-icon">🎵</span>
+        <h1 class="logo-text">MusicFinder</h1>
+      </div>
+      <nav class="sidebar-nav">
+        <button class="nav-btn active" data-target="lyrics-view">
+          <span class="nav-icon">📝</span> 가사 기반 검색
+        </button>
+        <button class="nav-btn" data-target="community-view">
+          <span class="nav-icon">💬</span> 음악 커뮤니티
+        </button>
+        <button class="nav-btn" id="nav-auth-btn" data-target="auth-view">
+          <span class="nav-icon">👤</span> 로그인 / 회원가입
+        </button>
+      </nav>
+      <div class="sidebar-user-card" id="sidebar-user-card" style="display: none;">
+        <div class="user-avatar">👤</div>
+        <div class="user-info">
+          <div class="user-name" id="user-display-name">Username</div>
+          <div class="user-email" id="user-display-email">email@test.com</div>
+        </div>
+        <button class="logout-btn" id="logout-btn" title="로그아웃">🚪</button>
+      </div>
+    </aside>
+
+    <!-- 오른쪽 메인 콘텐츠 영역 -->
+    <main class="main-content">
+      
+      <!-- 1. 가사 검색 뷰 -->
+      <section id="lyrics-view" class="view-panel active">
+        <div class="view-header">
+          <h2>가사 기반 노래 검색</h2>
+          <p>어렴풋이 생각나는 가사를 입력하여 원하는 곡을 검색해보세요.</p>
+        </div>
+        
+        <div class="search-box-container card">
+          <div class="search-input-wrapper">
+            <span class="search-icon">🔍</span>
+            <input type="text" id="lyrics-search-input" placeholder="기억나는 가사를 한 줄 이상 입력해보세요... (예: 동해물과 백두산이, 곰 세 마리가, baby got me looking so crazy)">
+          </div>
+          <button class="primary-btn search-btn" id="lyrics-search-btn">가사로 검색</button>
+        </div>
+
+        <div class="search-results-section">
+          <h3>검색 결과 <span class="badge" id="lyrics-result-count">0</span></h3>
+          <div class="results-list" id="lyrics-results-list">
+            <div class="no-data">
+              <span class="no-data-icon">🎶</span>
+              <p>검색어를 입력하고 검색 버튼을 눌러주세요.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+
+      <!-- 3. 커뮤니티 뷰 -->
+      <section id="community-view" class="view-panel">
+        <!-- 3-1. 게시글 목록 서브 뷰 -->
+        <div id="post-list-subview">
+          <div class="view-header flex-header">
+            <div>
+              <h2>음악 커뮤니티 게시판</h2>
+              <p>다른 음악인들과 정보를 공유하고 질문해 보세요.</p>
+            </div>
+            <button class="primary-btn icon-btn" id="btn-go-write">
+              <span>✍️</span> 새 글 작성
+            </button>
+          </div>
+
+          <div class="community-toolbar">
+            <div class="search-input-wrapper toolbar-search">
+              <span class="search-icon">🔍</span>
+              <input type="text" id="post-search-input" placeholder="게시글 제목이나 내용 검색...">
+            </div>
+          </div>
+
+          <div class="posts-container" id="posts-list-container">
+            <!-- Dynamic Post Cards -->
+          </div>
+        </div>
+
+        <!-- 3-2. 게시글 작성/수정 서브 뷰 -->
+        <div id="post-write-subview" style="display: none;">
+          <div class="view-header">
+            <button class="back-btn" id="btn-write-back">⬅ 목록으로 돌아가기</button>
+            <h2 id="write-view-title">새 커뮤니티 글 작성</h2>
+          </div>
+          
+          <div class="write-card card">
+            <input type="hidden" id="write-post-id">
+            <div class="form-group">
+              <label for="post-title-input">제목</label>
+              <input type="text" id="post-title-input" placeholder="제목을 입력해주세요.">
+            </div>
+            <div class="form-group">
+              <label for="post-content-input">내용</label>
+              <textarea id="post-content-input" rows="12" placeholder="음악 레퍼런스 필터링 질문, 곡 검색 요청, 악상 조언 등 자유롭게 작성해주세요."></textarea>
+            </div>
+            <div class="form-group">
+              <label>파일 첨부 (악보, 데모 오디오, 앨범 커버 등)</label>
+              <div class="file-uploader-box">
+                <button class="secondary-btn" id="btn-select-file">파일 선택...</button>
+                <span class="file-info-text" id="attached-file-name">선택된 파일 없음</span>
+                <button class="danger-btn text-btn" id="btn-remove-file" style="display: none;">제거</button>
+              </div>
+            </div>
+            <div class="write-actions">
+              <button class="secondary-btn" id="btn-write-cancel">취소</button>
+              <button class="primary-btn" id="btn-submit-post">작성 완료</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- 3-3. 게시글 상세 서브 뷰 -->
+        <div id="post-detail-subview" style="display: none;">
+          <div class="view-header">
+            <button class="back-btn" id="btn-detail-back">⬅ 목록으로 돌아가기</button>
+          </div>
+
+          <article class="post-detail-card card">
+            <header class="post-detail-header">
+              <h2 class="post-detail-title" id="post-detail-title">게시글 제목</h2>
+              <div class="post-detail-meta">
+                <span class="post-detail-author" id="post-detail-author">작성자</span>
+                <span class="meta-dot">•</span>
+                <span class="post-detail-date" id="post-detail-date">2026-06-21</span>
+                
+                <div class="post-owner-actions" id="post-owner-actions" style="display: none;">
+                  <button class="text-btn edit-btn" id="btn-edit-post">수정</button>
+                  <button class="text-btn delete-btn" id="btn-delete-post">삭제</button>
+                </div>
+              </div>
+            </header>
+
+            <div class="post-detail-body" id="post-detail-content">
+              게시글 내용
+            </div>
+
+            <div class="post-detail-attachment" id="post-detail-attachment-box" style="display: none;">
+              <span class="attach-icon">📎</span>
+              <span class="attach-name" id="post-detail-file-name">file_name.mp3</span>
+              <span class="attach-size" id="post-detail-file-size">(1.2 MB)</span>
+              <a href="#" class="attach-download" id="post-detail-file-path" title="로컬 파일 위치 열기">열기</a>
+            </div>
+
+            <!-- 댓글 섹션 -->
+            <section class="comments-section">
+              <h3>댓글 <span class="badge" id="comments-count">0</span></h3>
+              
+              <!-- 댓글 쓰기 폼 -->
+              <div class="comment-write-box" id="comment-write-box">
+                <textarea id="comment-input" rows="3" placeholder="의견을 남겨 상호작용하고 음악에 대해 논의해보세요..."></textarea>
+                <button class="primary-btn" id="btn-submit-comment">댓글 등록</button>
+              </div>
+              <div class="comment-write-login-msg" id="comment-login-msg" style="display: none;">
+                댓글을 작성하려면 로그인이 필요합니다.
+              </div>
+
+              <!-- 댓글 목록 -->
+              <div class="comments-list" id="comments-list-container">
+                <!-- Dynamic Comments -->
+              </div>
+            </section>
+          </article>
+        </div>
+      </section>
+
+      <!-- 4. 인증 뷰 (로그인/회원가입) -->
+      <section id="auth-view" class="view-panel">
+        <div class="auth-container">
+          <!-- 4-1. 로그인 카드 -->
+          <div class="auth-card card" id="login-card">
+            <h2>로그인</h2>
+            <p>로그인하여 커뮤니티에 참여하고 내 게시글을 관리하세요.</p>
+            
+            <div class="form-group">
+              <label for="login-id">아이디</label>
+              <input type="text" id="login-id" placeholder="아이디를 입력해주세요.">
+            </div>
+            
+            <div class="form-group">
+              <label for="login-pw">비밀번호</label>
+              <input type="password" id="login-pw" placeholder="비밀번호를 입력해주세요.">
+            </div>
+
+            <div class="form-row">
+              <label class="checkbox-container">
+                <input type="checkbox" id="login-remember">
+                <span class="checkmark"></span>
+                로그인 상태 유지
+              </label>
+            </div>
+
+            <div class="auth-error-msg" id="login-error-msg"></div>
+
+            <button class="primary-btn auth-submit-btn" id="btn-login-submit">로그인</button>
+            
+            <div class="auth-switch-msg">
+              아직 회원이 아니신가요? <button class="link-btn" id="btn-switch-to-signup">회원가입하기</button>
+            </div>
+          </div>
+
+          <!-- 4-2. 회원가입 카드 -->
+          <div class="auth-card card" id="signup-card" style="display: none;">
+            <h2>회원가입</h2>
+            <p>신규 계정을 만들어 가사/허밍 검색 결과를 개인 저장하고 공유해보세요.</p>
+            
+            <div class="form-group">
+              <label for="signup-id">아이디</label>
+              <div class="input-with-action">
+                <input type="text" id="signup-id" placeholder="사용할 아이디 입력">
+                <button class="secondary-btn btn-inline" id="btn-check-duplicate">중복 검사</button>
+              </div>
+              <div class="id-status-msg" id="id-status-msg"></div>
+            </div>
+
+            <div class="form-group">
+              <label for="signup-pw">비밀번호</label>
+              <input type="password" id="signup-pw" placeholder="비밀번호 (영문, 숫자 포함 6자 이상)">
+            </div>
+
+            <div class="form-group">
+              <label for="signup-pw-confirm">비밀번호 확인</label>
+              <input type="password" id="signup-pw-confirm" placeholder="비밀번호 다시 입력">
+            </div>
+
+            <div class="form-group">
+              <label for="signup-email">이메일 주소</label>
+              <input type="email" id="signup-email" placeholder="example@email.com">
+            </div>
+
+            <div class="auth-error-msg" id="signup-error-msg"></div>
+
+            <button class="primary-btn auth-submit-btn" id="btn-signup-submit">회원 가입</button>
+
+            <div class="auth-switch-msg">
+              이미 계정이 있으신가요? <button class="link-btn" id="btn-switch-to-login">로그인하기</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 5. 마이페이지 뷰 -->
+      <section id="mypage-view" class="view-panel">
+        <div class="view-header">
+          <h2>마이 페이지</h2>
+          <p>내 정보 관리와 내가 쓴 글, 댓글 목록을 한눈에 확인할 수 있습니다.</p>
+        </div>
+
+        <div class="mypage-layout">
+          <!-- 좌측: 내 정보 및 비밀번호 변경 -->
+          <div class="mypage-sidebar">
+            <div class="profile-card card">
+              <div class="profile-avatar">🎵</div>
+              <h3 id="mypage-username">Username</h3>
+              <div class="profile-meta-item">
+                <span class="label">이메일:</span>
+                <span class="value" id="mypage-email">email@test.com</span>
+              </div>
+              <div class="profile-meta-item">
+                <span class="label">가입일자:</span>
+                <span class="value" id="mypage-joined">2026-06-21</span>
+              </div>
+            </div>
+
+            <div class="password-change-card card">
+              <h4>비밀번호 변경</h4>
+              <div class="form-group">
+                <input type="password" id="pw-change-current" placeholder="현재 비밀번호">
+              </div>
+              <div class="form-group">
+                <input type="password" id="pw-change-new" placeholder="새 비밀번호 (6자 이상)">
+              </div>
+              <div class="form-group">
+                <input type="password" id="pw-change-confirm" placeholder="새 비밀번호 확인">
+              </div>
+              <div class="pw-change-error" id="pw-change-error"></div>
+              <button class="primary-btn" id="btn-change-password-submit">변경 완료</button>
+            </div>
+          </div>
+
+          <!-- 우측: 내 활동 내역 (게시글/댓글 탭) -->
+          <div class="mypage-activity card">
+            <div class="tab-headers">
+              <button class="tab-header-btn active" id="tab-btn-posts" data-tab="mypage-posts-tab">내가 작성한 글 (<span id="my-posts-count">0</span>)</button>
+              <button class="tab-header-btn" id="tab-btn-comments" data-tab="mypage-comments-tab">내가 작성한 댓글 (<span id="my-comments-count">0</span>)</button>
+            </div>
+
+            <div class="tab-content active" id="mypage-posts-tab">
+              <div class="activity-list" id="mypage-posts-list">
+                <!-- User Posts List -->
+              </div>
+            </div>
+
+            <div class="tab-content" id="mypage-comments-tab" style="display: none;">
+              <div class="activity-list" id="mypage-comments-list">
+                <!-- User Comments List -->
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+    </main>
+  </div>
+  
+  <script src="app.js"></script>
+</body>
+</html>
